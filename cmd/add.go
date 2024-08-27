@@ -116,13 +116,27 @@ func calculateFileHash(filePath string) (string, error) {
 	return fmt.Sprintf("%x", hash.Sum(nil)), nil
 }
 
-func saveFileToObjectStore(filePath, objectFilePath string) error {
-	if err := os.MkdirAll(filepath.Dir(objectFilePath), 0755); err != nil {
+// func saveFileToObjectStore(filePath, objectFilePath string) error {
+// 	if err := os.MkdirAll(filepath.Dir(objectFilePath), 0755); err != nil {
+// 		return err
+// 	}
+
+// 	return os.Link(filePath, objectFilePath)
+// }
+
+func saveFileToObjectStore(originalFilePath, objectFilePath string) error {
+	// Create the directory structure in the object store
+	objectDirPath := filepath.Join(goatDir, "objects", filepath.Dir(originalFilePath))
+	if err := os.MkdirAll(objectDirPath, 0755); err != nil {
 		return err
 	}
 
-	return os.Link(filePath, objectFilePath)
+	// Save the file content with the hash as the filename in the original directory structure
+	objectFilePath = filepath.Join(objectDirPath, filepath.Base(objectFilePath))
+
+	return os.Link(originalFilePath, objectFilePath)
 }
+
 
 func updateIndex(filePath, hash string) error {
 	indexFilePath := filepath.Join(goatDir, "index")
