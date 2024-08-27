@@ -1,0 +1,35 @@
+func checkout() error {
+	indexFilePath := filepath.Join(goatDir, "index")
+	indexFile, err := os.Open(indexFilePath)
+	if err != nil {
+		return fmt.Errorf("could not open index file: %w", err)
+	}
+	defer indexFile.Close()
+
+	scanner := bufio.NewScanner(indexFile)
+	for scanner.Scan() {
+		line := scanner.Text()
+		parts := strings.SplitN(line, " ", 2)
+		if len(parts) != 2 {
+			return fmt.Errorf("invalid index entry: %s", line)
+		}
+		hash, filePath := parts[0], parts[1]
+
+		// Reconstruct the original directory structure
+		objectFilePath := filepath.Join(goatDir, "objects", filePath)
+		if err := os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
+			return fmt.Errorf("could not create directory for %s: %w", filePath, err)
+		}
+
+		// Copy the file from the object store to the original location
+		if err := os.Link(objectFilePath, filePath); err != nil {
+			return fmt.Errorf("could not restore file %s: %w", filePath, err)
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return fmt.Errorf("error reading index file: %w", err)
+	}
+
+	return nil
+}
