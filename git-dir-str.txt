@@ -1,0 +1,23 @@
+.git/
+│
+├── HEAD
+├── config
+├── description
+├── hooks/
+│   └── [sample hook scripts]
+├── info/
+│   └── exclude
+├── objects/
+│   └── [object data and directories]
+├── refs/
+│   ├── heads/
+│   │   └── main
+│   └── tags/
+├── index
+├── packed-refs
+├── logs/
+│   └── refs/
+│       └── heads/
+│           └── main
+├── COMMIT_EDITMSG
+└── ORIG_HEAD
