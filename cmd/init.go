@@ -2,9 +2,11 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -29,6 +31,20 @@ func initRepo() {
 		return
 	}
 	
+	// Ask the user for the remote repository URL
+	fmt.Print("Enter the remote repository URL (leave empty to skip): ")
+	reader := bufio.NewReader(os.Stdin)
+	remoteURL, _ := reader.ReadString('\n')
+	remoteURL = strings.TrimSpace(remoteURL)
+	// If remoteURL is empty, assign the default path
+	if remoteURL == "" {
+		remoteURL = "/home/camle/Desktop"
+		fmt.Println("No remote URL provided. Using default:", remoteURL)
+	} else {
+		fmt.Println("Using provided remote URL:", remoteURL)
+	}
+
+	
 	dirs := []string{
 		"hooks",
 		"info",
@@ -45,9 +61,25 @@ func initRepo() {
 		}
 	} 
 	
+	// Prepare the config content
+	configContent := `[core]
+    repositoryformatversion = 0
+    filemode = true
+    bare = false
+	`
+	// if remoteURL != "" {
+		configContent += fmt.Sprintf(`
+[remote "origin"]
+    url = %s
+    fetch = +refs/heads/*:refs/remotes/origin/*
+`, remoteURL)
+	// }
+	fmt.Println("remoteurl", remoteURL)
+
+	
 	files := map[string]string{
 		"HEAD": "ref: refs/heads/main\n",
-		"config": "",
+		"config": configContent,
 		"description": "Unnamed repository; edit this file 'description' to name the repository.\n",
 		"info/exclude": "# git ls-files --others --exclude-from=.git/info/exclude\n" +
 			"# Lines that start with '#' are comments.\n" +
