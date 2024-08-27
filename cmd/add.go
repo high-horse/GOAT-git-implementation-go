@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	_"strings"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -20,6 +20,13 @@ var addCommand = &cobra.Command{
 	Short: "Stage files for commit",
 	Long:  "The add command stages the specified files, preparing them to be committed.",
 	Run: func(cmd *cobra.Command, args []string) {
+		
+  		// Check if we're in a Git repository
+        // if _, err := os.Stat(".git"); !os.IsNotExist(err) {
+        //     fmt.Println("Error: It appears you're in a Git repository. Please use Goat in a different directory.")
+        //     return
+        // }
+        
 		if len(args) == 0 {
 			fmt.Println("Error: No files specified")
 			return
@@ -77,6 +84,9 @@ func addAllFiles(dir string) error {
             if info.Name() == ".git" || info.Name() == ".goat" {
                 return filepath.SkipDir
             }
+            return nil
+        }
+        if strings.HasPrefix(info.Name(), ".") {
             return nil
         }
 		// if info.IsDir() || strings.HasPrefix(info.Name(), ".") || path == goatDir {
