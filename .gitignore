@@ -1,3 +1,6 @@
 .goat/
 
+bin
+.goat
+
 go.sum
